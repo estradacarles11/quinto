@@ -1,6 +1,9 @@
 import random
 import csv
 import math
+from fpdf import FPDF
+
+totalTables = 100
 
 
 def shuffle(list, seed=None):
@@ -59,6 +62,7 @@ def generateValidTables(totalTables, initialSeed=0):
     possibleNumbers = list(range(1, 91))
 
     validTables = []
+    validLines = []
 
     listOfQuadrants = []
     listOfRows = []
@@ -77,7 +81,6 @@ def generateValidTables(totalTables, initialSeed=0):
             check, listOfQuadrants, listOfRows = checkTable(generatedTable, listOfQuadrants, listOfRows)
 
             if check:
-                # validTables.append(shuffledNumbers)
                 validTables.append(generatedTable)
 
     except KeyboardInterrupt:
@@ -87,22 +90,28 @@ def generateValidTables(totalTables, initialSeed=0):
 
     return validTables
 
-def quinto2CSV(quinto):
+def table2lines(table):
 
-    for t in range(len(validTables)):
-        
-        table4CSV = []
+    lines= []
 
-        for l in range(9):
-            line = validTables[t][int(l/3)*2][l%3] + validTables[t][int(l/3)*2+1][l%3]
-            table4CSV.append(line)
+    for l in range(9):
+        line = table[int(l/3)*2][l%3] + table[int(l/3)*2+1][l%3]
+        lines.append(line)
+
+    return lines
+
+def quintoTables2CSV(tables):
+
+    for t in range(len(tables)):
+
+        quintoLines = table2lines(tables[t])        
         
-        filename = './output/quinto_'+ str(t+1).zfill(math.floor(math.log10(len(validTables))+1)) +'.csv'
+        filename = './output/quinto_'+ str(t+1).zfill(math.floor(math.log10(len(tables))+1)) +'.csv'
 
         try:
             with open(filename, 'w', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerows(table4CSV)
+                writer.writerows(quintoLines)
         except:
             print('Error writing CSV file:', filename)
             return False
@@ -111,7 +120,48 @@ def quinto2CSV(quinto):
 
 
 if __name__ == '__main__':
-    validTables = generateValidTables(10)
-    quinto2CSV(validTables)
+    validTables = generateValidTables(totalTables)
+    quintoTables2CSV(validTables)
+
+    # A5 dimensions: 210 x 148 mm
+    # Margins: 10 (left) x 2 (top) x 10 (right) x 10 (bottom) mm
+    # Title height: 10 mm
+    # Available space for the table: 190 x 126 mm
+    # Cells: 19 x 14 mm
+
+    cellW = 19
+    cellH = 14
+
+    # Set up the page    
+    pdf = FPDF(orientation='l', unit='mm', format='a5')
+    pdf.set_auto_page_break(False)
+
+    for t in range(len(validTables)):
+        
+        pdf.add_page()
+
+        # Title
+        pdf.set_xy(10, 2)
+        pdf.set_font('helvetica', 'B', 18)
+        pdf.cell(w=190, h=10, txt='Quinto nº' + str(t+1), border=0, ln=2, align='C')
+        
+        lines = table2lines(validTables[t])
+
+        # Table
+        pdf.set_font('helvetica', 'B', 24)
+        pdf.set_line_width(0.2)
+        for line in lines:
+            for number in line:
+                pdf.cell(w=cellW, h=cellH, txt=str(number), border=1, ln=0, align='C')
+            pdf.cell(w=0, h=cellH, ln=1)
+        
+        pdf.set_xy(10,12)
+        pdf.set_line_width(1)
+        for col in range(2):
+            for row in range(3):
+                pdf.rect(x=10+col*cellW*5, y=12+row*cellH*3, w=cellW*5, h=cellH*3)
+
+    pdf.output('./output/quinto.pdf', 'F')
+    exit()
 
 
