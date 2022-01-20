@@ -118,10 +118,7 @@ def quintoTables2CSV(tables):
 
     return True
 
-
-if __name__ == '__main__':
-    validTables = generateValidTables(totalTables)
-    quintoTables2CSV(validTables)
+def quintoTables2PDF(tables):
 
     # A5 dimensions: 210 x 148 mm
     # Margins: 10 (left) x 2 (top) x 10 (right) x 10 (bottom) mm
@@ -136,7 +133,7 @@ if __name__ == '__main__':
     pdf = FPDF(orientation='l', unit='mm', format='a5')
     pdf.set_auto_page_break(False)
 
-    for t in range(len(validTables)):
+    for t in range(len(tables)):
         
         pdf.add_page()
 
@@ -145,7 +142,7 @@ if __name__ == '__main__':
         pdf.set_font('helvetica', 'B', 18)
         pdf.cell(w=190, h=10, txt='Quinto nº' + str(t+1), border=0, ln=2, align='C')
         
-        lines = table2lines(validTables[t])
+        lines = table2lines(tables[t])
 
         # Table
         pdf.set_font('helvetica', 'B', 24)
@@ -162,6 +159,12 @@ if __name__ == '__main__':
                 pdf.rect(x=10+col*cellW*5, y=12+row*cellH*3, w=cellW*5, h=cellH*3)
 
     pdf.output('./output/quinto.pdf', 'F')
-    exit()
 
+    return True
 
+if __name__ == '__main__':
+    validTables = generateValidTables(totalTables)
+    quintoTables2CSV(validTables)
+    quintoTables2PDF(validTables)
+
+exit()
