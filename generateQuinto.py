@@ -1,4 +1,6 @@
 import random
+import csv
+import math
 
 
 def shuffle(list, seed=None):
@@ -72,23 +74,44 @@ def generateValidTables(totalTables, initialSeed=0):
 
             generatedTable = generateTable(shuffledNumbers)
 
-            check, listOfQuadrants, listOfRows = checkTable(
-                generatedTable, listOfQuadrants, listOfRows)
+            check, listOfQuadrants, listOfRows = checkTable(generatedTable, listOfQuadrants, listOfRows)
 
             if check:
                 # validTables.append(shuffledNumbers)
                 validTables.append(generatedTable)
 
     except KeyboardInterrupt:
-        print('The eneration of Quinto tables has been interrupted.')
+        print('The generation of Quinto tables has been interrupted.')
 
     print('The total number of generated tables is:', len(validTables))
 
     return validTables
 
+def quinto2CSV(quinto):
+
+    for t in range(len(validTables)):
+        
+        table4CSV = []
+
+        for l in range(9):
+            line = validTables[t][int(l/3)*2][l%3] + validTables[t][int(l/3)*2+1][l%3]
+            table4CSV.append(line)
+        
+        filename = './output/quinto_'+ str(t+1).zfill(math.floor(math.log10(len(validTables))+1)) +'.csv'
+
+        try:
+            with open(filename, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerows(table4CSV)
+        except:
+            print('Error writing CSV file:', filename)
+            return False
+
+    return True
+
 
 if __name__ == '__main__':
-    validTables = generateValidTables(100)
+    validTables = generateValidTables(10)
+    quinto2CSV(validTables)
 
-    # for table in validTables:
-    #     print(table)
+
