@@ -47,6 +47,8 @@ def checkTable(table, listOfQuadrants, listOfRows):
     return True, listOfQuadrants, listOfRows
 
 def generateValidTables(totalTables, initialSeed=0):
+    print('Generation of Quinto tables started, please wait...')
+    print('Press CTRL-C at any time to stop the generation and validation of Quinto tables if it takes too long.')
 
     possibleNumbers = list(range(1,91))
 
@@ -57,26 +59,31 @@ def generateValidTables(totalTables, initialSeed=0):
 
     seed = initialSeed
 
-    while len(validTables) < totalTables:
+    try:
 
-        shuffledNumbers = shuffle(possibleNumbers, seed)
-        seed += 1
+        while len(validTables) < totalTables:
 
-        generatedTable = generateTable(shuffledNumbers)
+            shuffledNumbers = shuffle(possibleNumbers, seed)
+            seed += 1
 
-        check, listOfQuadrants, listOfRows = checkTable(generatedTable, listOfQuadrants, listOfRows)
+            generatedTable = generateTable(shuffledNumbers)
 
-        if check:
-            # validTables.append(shuffledNumbers )
-            validTables.append(generatedTable)
+            check, listOfQuadrants, listOfRows = checkTable(generatedTable, listOfQuadrants, listOfRows)
+
+            if check:
+                # validTables.append(shuffledNumbers)
+                validTables.append(generatedTable)
+    
+    except KeyboardInterrupt:
+        print('The eneration of Quinto tables has been interrupted.')
+    
+    print('The total number of generated tables is:', len(validTables))
     
     return validTables
 
 
 if __name__ == '__main__':
-    validTables = generateValidTables(10)
+    validTables = generateValidTables(100)
 
-    for table in validTables:
-        print(table)
-
-
+    # for table in validTables:
+    #     print(table)
